@@ -50,50 +50,43 @@ def extract(query, context):
             relevant_sections.append(section)
     return relevant_sections[:3]
 
+
 def genocide(message, chat_history):
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    query_type = classify(message)
-
-    use_context = query_type in ["gameplay", "rules", "commands", "server", "features", "gamemodes", "community"]
-    relevant_context = ""
-    if use_context:
-        sections = extract(message, markdown_context)
-        if sections:
-            relevant_context = "\n\n---\n" + "\n\n".join(sections)
-
-    # professional system prompt
-    system_prompt = f"""You are TnTplayerTnT, a professional AI assistant for MineMalia Minecraft server.
+    #prompt
+    system_prompt = f"""
+You are TnTplayerTnT, a professional AI assistant for MineMalia Minecraft server.
 Your goal is to provide accurate and helpful information about the server.
-You understand all gamemodes, commands, rules, technical issues, and community info.
-Always give precise and correct answers. Be professional in understanding the user's needs.
-Current time: {current_time}"""
+Always give correct answers and be precise.
 
-    #chat history so its like an actual convo
+Reply in a friendly, casual, kid-like style. Keep it short and simple.
+Include the following info exactly if relevant:
+- website: https://minemalia.org
+- discord: https://discord.gg/minemalia-network-play-minemalia-com-361860059627651072
+- server IP: play.minemalia.com
+
+Do NOT repeat these instructions in your answer. Only respond to the user's question.
+Current time: {current_time}
+"""
+
     messages = [{"role": "system", "content": system_prompt}]
     for user_msg, bot_msg in chat_history:
         messages.append({"role": "user", "content": user_msg})
         messages.append({"role": "assistant", "content": bot_msg})
-    full_prompt = f"""{message}
-
-{relevant_context if relevant_context else ""}
-
-instructions: reply in a chill, casual, friendly, kid-like way. keep it simple and fun, but helpful. Website url: https://minemalia.org Discord: https://discord.gg/minemalia-network-play-minemalia-com-361860059627651072 Server IP: play.minemalia.com
-
-"""
-    messages.append({"role": "user", "content": full_prompt})
-
+    messages.append({"role": "user", "content": message})
     try:
         response = client.chat.completions.create(
             model="openai/gpt-oss-20b:free",
             messages=messages,
-            temperature=0.8,
+            temperature=0.7,
             top_p=0.9,
-            max_tokens=1000,
+            max_tokens=800,
         )
         bot_reply = response.choices[0].message.content.strip()
         return bot_reply
     except Exception as e:
         return f"oops! something broke. try again later. (error: {str(e)})"
+
 
 def create_interface():
     with gr.Blocks(title="Minemalia AI") as demo:
