@@ -15,8 +15,7 @@ with open("minemalia.md", "r", encoding="utf-8") as f:
 
 def minemalia_ai(message, chat_history):
     """
-    AI assistant for Minemalia server.
-    Always includes full chat history and full markdown context.
+    tnt
     """
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
@@ -84,7 +83,6 @@ def create_interface():
                 "im banned, how do i appeal?",
                 "what is the discord link?",
                 "who is the best player?",
-                "how do i commit war crimes?",
             ],
             inputs=msg,
             label="Example questions"
